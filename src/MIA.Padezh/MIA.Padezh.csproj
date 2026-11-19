@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>MIA.Padezh</RootNamespace>
+    <AssemblyName>MIA.Padezh</AssemblyName>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>0.4.0</Version>
+    <PackageId>MIA.Padezh</PackageId>
+    <Authors>MIA</Authors>
+    <Product>MIA.Padezh</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Склонение русских ФИО по падежам. Детерминированное, без внешних зависимостей; правила Petrovich компилируются в код на этапе сборки (AOT-friendly).</Description>
+    <PackageTags>склонение;падеж;padezh;declension;russian;fio;ФИО;petrovich;names</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

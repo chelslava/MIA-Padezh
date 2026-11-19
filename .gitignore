@@ -1,0 +1,16 @@
+## .NET
+bin/
+obj/
+artifacts/
+*.user
+*.suo
+.vs/
+.idea/
+TestResults/
+*.nupkg
+*.snupkg
+nuget.config
+
+## Отчёты eval
+eval-report.txt
+report-filtered.txt
