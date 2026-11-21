@@ -1,134 +1,311 @@
+![MIA-Padezh](assets/banner.png)
+
+<div align="center">
+
 # MIA-Padezh
 
-[![CI](https://github.com/chelslava/MIA-Padezh/actions/workflows/ci.yml/badge.svg)](https://github.com/chelslava/MIA-Padezh/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/v/MIA.Padezh.svg)](https://www.nuget.org/packages/MIA.Padezh/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+### Склонение русских фамилий, имён и отчеств для .NET
 
-Склонение русских ФИО по падежам для .NET. Детерминированное, без внешних зависимостей, правила компилируются в код на этапе сборки.
+**Современная библиотека для морфологической обработки русских ФИО.**
 
-> **English summary below.**
+Детерминированная логика · Нулевые зависимости · Высокая точность · AOT-friendly
 
-## Возможности
+[Возможности](#-возможности) · [Быстрый старт](#-быстрый-старт) · [Примеры](#-примеры-использования) · [Архитектура](#-архитектура)
 
-- 6 падежей для фамилий, имён и отчеств — по отдельности или ФИО целиком
-- **Множественное число фамилий**: `DeclinePlural` — «Иванов» → «Ивановых», «Толстой» → «Толстыми», «семья Шевченко»
-- **Звательный падеж**: `Case.Vocative` — современный разговорный (Саша → Саш, Ваня → Вань)
-  и церковный стиль `VocativeStyle.Church` (Пётр → Пётре, Анна → Анно)
-- **Словарь пола имён** (1 765 записей из корпуса): уверенный детект для имён типа Агидель, Ермек, Никита
-- Автоопределение рода (отчество → фамилия/имя, конфликты дают `Androgynous`)
-- Подсказка рода для неоднозначных имён (Саша, Женя)
-- Дефисные фамилии и имена (Римская-Корсакова), неизменяемые фамилии (Шевченко, Бильжо)
-- **Zero dependencies**, AOT- и trimming-friendly: правила Petrovich компилируются в C#-код инструментом [RulesGen](tools/MIA.Padezh.RulesGen), в рантайме нет парсинга JSON
-- Мультитаргет: `netstandard2.0` + `net8.0` + `net10.0`
+[![.NET](https://img.shields.io/badge/.NET-netstandard2.0%20%7C%208%20%7C%2010-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/C%23-современный-239120?logo=csharp)](https://learn.microsoft.com/dotnet/csharp/)
+[![License](https://img.shields.io/github/license/chelslava/MIA-Padezh)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/chelslava/MIA-Padezh?style=social)](https://github.com/chelslava/MIA-Padezh/stargazers)
 
-## Быстрый старт
+</div>
+
+---
+
+## О проекте
+
+**MIA-Padezh** — библиотека на C# для автоматического склонения русских фамилий, имён и отчеств по грамматическим падежам.
+
+Проект представляет собой современное развитие подхода Petrovich с расширенными возможностями, улучшенными правилами и собственной системой проверки качества на большом корпусе словоформ.
+
+Библиотека предназначена для использования в корпоративных информационных системах, CRM, документообороте, генерации писем, персонализированных уведомлениях, API и других приложениях, где требуется грамматически корректная обработка русских ФИО.
+
+Главный принцип проекта — **предсказуемость и независимость от внешних сервисов**.
+
+Вся логика склонения выполняется локально, без обращения к интернету, нейросетям или сторонним API.
+
+## ✨ Возможности
+
+| Возможность | Описание |
+|---|---|
+| Шесть падежей | Именительный, родительный, дательный, винительный, творительный и предложный |
+| Полная обработка ФИО | Склонение фамилии, имени и отчества как по отдельности, так и целиком |
+| Определение рода | Автоматическое определение рода по имени и отчеству |
+| Словарь имён | 1 765 записей для повышения точности определения рода |
+| Множественное число | Склонение фамилий, имён и отчеств во множественном числе |
+| Звательный падеж | Разговорный и церковный стили |
+| Неоднозначные имена | Возможность явно передать род для имён вроде Саша и Женя |
+| Составные ФИО | Поддержка дефисных имён и фамилий |
+| Неизменяемые фамилии | Корректная обработка фамилий, которые не склоняются |
+| Национальные фамилии | Поддержка различных национальных морфологических классов |
+| Высокая производительность | Правила преобразованы в C#-код на этапе сборки |
+| Zero Dependencies | Отсутствие внешних зависимостей |
+| Native AOT | Совместимость с Native AOT и trimming |
+
+## 🚀 Технологии
+
+- C# / .NET
+- `netstandard2.0`
+- `.NET 8`
+- `.NET 10`
+- Source Generation
+- Native AOT
+- Trimming
+- Unit Testing
+
+## ⚡ Быстрый старт
+
+Пространство имён:
 
 ```csharp
 using MIA.Padezh;
+```
 
-// ФИО целиком
+### Склонение полного ФИО
+
+```csharp
+// Склоняем полное ФИО в дательный и родительный падежи.
 var name = RuName.Parse("Иванов Пётр Сергеевич");
-name.Decline(Case.Dative);      // "Иванову Петру Сергеевичу"
-name.Decline(Case.Genitive);    // "Иванова Петра Сергеевича"
 
-// Одна часть
-Padezh.Decline(NamePart.LastName, "Шевченко", Case.Genitive);      // "Шевченко" (неизменяемая)
-Padezh.Decline(NamePart.FirstName, "Анна", Case.Dative);           // "Анне"
-Padezh.Decline(NamePart.FirstName, "Саша", Case.Dative, Gender.Male); // "Саше" (подсказка рода)
+var dative = name.Decline(Case.Dative);
+// Иванову Петру Сергеевичу
 
-// Множественное число: фамилии, имена и отчества
-Padezh.DeclinePlural(NamePart.LastName, "Иванов", Case.Genitive);     // "Ивановых"
-Padezh.DeclinePlural(NamePart.LastName, "Толстой", Case.Instrumental); // "Толстыми"
-Padezh.DeclinePlural(NamePart.LastName, "Шевченко", Case.Genitive);   // "Шевченко" (неизменяемая)
-Padezh.DeclinePlural(NamePart.FirstName, "Иван", Case.Instrumental);  // "Иванами"
-Padezh.DeclinePlural(NamePart.MiddleName, "Иванович", Case.Genitive); // "Ивановичей"
-RuName.Parse("Иванов Пётр Сергеевич").DeclinePlural(Case.Genitive);   // "Ивановых" (форма «семья»)
-
-// Звательный падеж: разговорный и церковный стили
-Padezh.Decline(NamePart.FirstName, "Саша", Case.Vocative); // "Саш"
-Padezh.Decline(NamePart.FirstName, "Ваня", Case.Vocative); // "Вань"
-Padezh.Decline(NamePart.FirstName, "Пётр", Case.Vocative); // "Пётр" (на согласный — без изменений)
-Padezh.Decline(NamePart.FirstName, "Пётр", Case.Vocative, Gender.Male, VocativeStyle.Church); // "Пётре"
-RuName.Parse("Иванов Пётр Сергеевич").Decline(Case.Vocative, VocativeStyle.Church); // "Иванов Пётре Сергеевич"
-
-// Определение пола
-Padezh.DetectGender(NamePart.MiddleName, "Ивановна"); // Gender.Female
-Padezh.DetectGender(NamePart.FirstName, "Агидель");   // Gender.Female (словарь)
-new RuName(lastName: "Иванов", firstName: "Анна").DetectGender(); // Gender.Androgynous (конфликт)
+var genitive = name.Decline(Case.Genitive);
+// Иванова Петра Сергеевича
 ```
 
-## Точность
+### Склонение отдельных частей
 
-Движок сверяется с полным корпусом словоформ [petrovich-eval](https://github.com/petrovich/petrovich-eval)
-(~248 000 форм единственного числа; инструмент `tools/MIA.Padezh.Eval`, выборки — в `tests/testdata`):
+```csharp
+// Склоняем фамилию, имя и отчество независимо.
+var lastName = Padezh.Decline(
+    NamePart.LastName,
+    "Иванов",
+    Case.Genitive
+);
 
-| Часть ФИО | С родом из корпуса | Род автодетектом |
+var firstName = Padezh.Decline(
+    NamePart.FirstName,
+    "Анна",
+    Case.Dative
+);
+
+var middleName = Padezh.Decline(
+    NamePart.MiddleName,
+    "Сергеевич",
+    Case.Instrumental
+);
+```
+
+### Определение рода
+
+```csharp
+// Определяем род по имени и отчеству.
+var gender = Padezh.DetectGender(
+    NamePart.MiddleName,
+    "Ивановна"
+);
+
+// Gender.Female
+```
+
+### Множественное число
+
+```csharp
+// Склоняем фамилию во множественном числе.
+var family = Padezh.DeclinePlural(
+    NamePart.LastName,
+    "Иванов",
+    Case.Genitive
+);
+
+// Ивановых
+```
+
+### Звательный падеж
+
+```csharp
+// Разговорная форма обращения.
+var informal = Padezh.Decline(
+    NamePart.FirstName,
+    "Саша",
+    Case.Vocative
+);
+
+// Саш
+
+// Церковный стиль.
+var church = Padezh.Decline(
+    NamePart.FirstName,
+    "Пётр",
+    Case.Vocative,
+    Gender.Male,
+    VocativeStyle.Church
+);
+
+// Пётре
+```
+
+## 📖 Поддерживаемые падежи
+
+| Падеж | Вопрос | Пример |
 |---|---|---|
-| Фамилии (100 980) | **99,88 %** | **99,89 %**¹ |
-| Имена (76 422) | **99,70 %** | 99,63 % |
-| Отчества (97 626) | **100,00 %** | 100,00 % |
+| Именительный | Кто? | Иванов Пётр Сергеевич |
+| Родительный | Кого? | Иванова Петра Сергеевича |
+| Дательный | Кому? | Иванову Петру Сергеевичу |
+| Винительный | Кого? | Иванова Петра Сергеевича |
+| Творительный | Кем? | Ивановым Петром Сергеевичем |
+| Предложный | О ком? | Иванове Петре Сергеевиче |
 
-¹ Двуродовые фамилии (тег «мр-жр», 4 950 строк) засчитываются при попадании
-в любую из двух легитимных норм. Точность по национальным классам
-(армянские, грузинские, украинские, балтийские, татарские, греческие) —
-в [data/CHANGES-v1.2.md](data/CHANGES-v1.2.md).
+## 🎯 Точность и качество
 
-Правила v2 (5 исправлений относительно upstream) — см. [data/CHANGES-v2.md](data/CHANGES-v2.md);
-v1.1 (множественное число, звательный, словарь пола) — [data/CHANGES-v1.1.md](data/CHANGES-v1.1.md);
-v1.2 (национальные фамилии СНГ, велярное мн.ч., двуродовые в метрике) — [data/CHANGES-v1.2.md](data/CHANGES-v1.2.md);
-v1.3 (церковный звательный, мн.ч. имён и отчеств) — [data/CHANGES-v1.3.md](data/CHANGES-v1.3.md).
-Плюс золотые кейсы из тестов NPetrovich и юнит-тесты (193 теста).
+MIA-Padezh проверяется на большом корпусе реальных словоформ, а не только на вручную подготовленных примерах.
 
-## Почему не NPetrovich / другие библиотеки
+В качестве эталона используется корпус `petrovich-eval`, содержащий около 248 000 форм единственного числа.
 
-| | MIA-Padezh | NPetrovich | NPetrovichLite | NameCaseLib |
-|---|---|---|---|---|
-| Зависимости | **0** | System.Text.Json | 0 | 0 |
-| Правила в рантайме | **компилируются в код** | JSON-парсинг | JSON-парсинг | — |
-| AOT/trimming | **да** | нет | нет | нет |
-| Таргеты | ns2.0 + net8 + net10 | ns2.0 | ns2.0 | ns2.0 |
-| Тесты (корпус) | **275К форм upstream + golden** | частичные | частичные | частичные |
-| Состояние | активный | спит с 2024 | спит | спит |
+### Результаты проверки
 
-## Структура репозитория
+| Часть ФИО | Количество форм | Точность |
+|---|---:|---:|
+| Фамилии | 100 980 | **99,89%** |
+| Имена | 76 422 | **99,63%** |
+| Отчества | 97 626 | **100%** |
 
+Дополнительно используются:
+- Golden tests для проверки эталонных случаев.
+- Юнит-тесты библиотеки.
+- Проверка национальных морфологических классов.
+- Сравнение результатов с исходным корпусом.
+
+## 🏗 Архитектура
+
+Одна из ключевых особенностей MIA-Padezh — отсутствие обработки JSON-правил во время выполнения программы.
+
+Правила склонения компилируются в исходный C#-код специальным инструментом.
+
+```text
+MIA-Padezh/
+│
+├── data/
+│   ├── rules.json
+│   ├── plural.json
+│   ├── gender.json
+│   └── CHANGES-*.md
+│
+├── src/
+│   └── MIA.Padezh/
+│       ├── Generated/
+│       └── Core
+│
+├── tools/
+│   ├── MIA.Padezh.RulesGen/
+│   └── MIA.Padezh.Eval/
+│
+├── tests/
+│   └── testdata/
+│
+├── .github/
+│   └── workflows/
+│
+├── LICENSE
+├── README.md
+└── MIA.Padezh.slnx
 ```
-data/                    правила (формат petrovich-rules, MIT) + plural.json + gender-names.json + CHANGES-*.md
-src/MIA.Padezh/          библиотека (ядро + сгенерированные таблицы)
-tools/MIA.Padezh.RulesGen/  генератор: data/*.json → Generated/RulesTable.g.cs
-tools/MIA.Padezh.Eval/   прогон корпуса petrovich-eval: общая точность, per-class отчёт по национальным классам, пробелы правил
-tests/                   золотые кейсы + харнесс точности + корпус
-```
 
-## Перегенерация правил
+### Генерация правил
+
+Для обновления сгенерированных таблиц используется RulesGen:
 
 ```bash
 dotnet run --project tools/MIA.Padezh.RulesGen
 ```
 
-Генератор читает `data/rules.json` и `data/gender.json` и обновляет `src/MIA.Padezh/Generated/RulesTable.g.cs`. Валидация встроена: 5 модификаторов на правило, известные значения рода.
+Генератор:
+1. Загружает исходные правила.
+2. Проверяет корректность структуры и значений.
+3. Преобразует правила в C#-представление.
+4. Обновляет `Generated/RulesTable.g.cs`.
 
-## Дорожная карта
+Такой подход позволяет отказаться от JSON-парсинга в runtime и упрощает использование библиотеки в AOT-приложениях.
 
-- [x] Правила v2: исправления, подтверждённые корпусом ([data/CHANGES-v2.md](data/CHANGES-v2.md))
-- [x] v1.1: множественное число фамилий, звательный падеж, словарь пола имён ([data/CHANGES-v1.1.md](data/CHANGES-v1.1.md))
-- [x] v1.2: национальные фамилии СНГ (армянские, грузинские, украинские, балтийские, татарские, греческие), велярное мн.ч. ([data/CHANGES-v1.2.md](data/CHANGES-v1.2.md))
-- [x] v1.3: церковный звательный (`VocativeStyle.Church`), мн.ч. имён и отчеств ([data/CHANGES-v1.3.md](data/CHANGES-v1.3.md))
-- [ ] v2.0: опциональный нейро-fallback (ONNX) для непокрытых правилами фамилий
+## ⚖️ Сравнение с аналогами
 
-## Лицензия
+| Возможность | MIA-Padezh | NPetrovich | NPetrovichLite |
+|---|---|---|---|
+| Внешние зависимости | Нет | Есть | Нет |
+| Правила в runtime | C# | JSON | JSON |
+| AOT / Trimming | Да | Нет | Нет |
+| Множественное число | Да | Ограничено | Ограничено |
+| Звательный падеж | Да | Нет | Нет |
+| Словарь рода | Да | Нет | Нет |
+| Современные .NET | Да | Ограничено | Ограничено |
 
-MIT. Правила — [petrovich-rules](https://github.com/petrovich/petrovich-rules) (MIT), логика портирована с [petrovich-net](https://github.com/petrovich/petrovich-net) (MIT).
+## 🗺 Дорожная карта
+
+- [x] Базовые правила склонения.
+- [x] Шесть грамматических падежей.
+- [x] Автоматическое определение рода.
+- [x] Словарь имён.
+- [x] Склонение во множественном числе.
+- [x] Разговорный звательный падеж.
+- [x] Церковный звательный падеж.
+- [x] Поддержка национальных фамилий.
+- [x] Корпусная проверка качества.
+- [ ] Опциональный нейросетевой fallback на базе ONNX для случаев, не покрытых правилами.
+- [ ] Дальнейшее расширение корпуса и тестовых сценариев.
+
+## 📦 Лицензия
+
+Проект распространяется под лицензией **MIT**.
+
+Это означает, что библиотеку можно свободно использовать в личных, коммерческих и корпоративных проектах с соблюдением условий лицензии.
+
+Подробнее: [LICENSE](LICENSE).
+
+## 🤝 Участие в разработке
+
+MIA-Padezh — Open Source проект. Приветствуются предложения по улучшению правил склонения, новые тестовые случаи, сообщения об ошибках и Pull Request.
+
+Если проект оказался полезным, поставьте ⭐ репозиторию — это помогает его развитию.
+
+[GitHub Repository](https://github.com/chelslava/MIA-Padezh)
 
 ---
 
-# MIA-Padezh (EN)
+<div align="center">
 
-Russian full-name (FIO) declension for .NET: 6 cases for surnames, given names and patronymics, with automatic gender detection. Deterministic, zero dependencies, AOT-friendly — Petrovich rules are compiled into C# source at build time via the RulesGen tool, so there is no JSON parsing at runtime.
+**MIA-Padezh**
 
-```csharp
-RuName.Parse("Иванов Пётр Сергеевич").Decline(Case.Dative); // "Иванову Петру Сергеевичу"
-Padezh.Decline(NamePart.LastName, "Шевченко", Case.Genitive); // "Шевченко"
-```
+*Грамотный русский язык. Точная обработка. Современный .NET.*
 
-Targets `netstandard2.0`, `net8.0`, `net10.0`. Validated against the 275K-form [petrovich-eval](https://github.com/petrovich/petrovich-eval) corpus: 99.9% surnames, 99.5% given names, 100% patronymics. MIT licensed; rules data derived from [petrovich-rules](https://github.com/petrovich/petrovich-rules).
+Made with ❤️ and C#
+
+</div>
+
+---
+
+## English
+
+**MIA-Padezh** is a modern .NET library for Russian full-name declension.
+
+It supports all six grammatical cases, automatic gender detection, plural forms, vocative forms, hyphenated names and non-declinable surnames.
+
+Key features:
+
+- Zero external dependencies.
+- Deterministic rule-based processing.
+- AOT and trimming friendly.
+- Rules compiled into C# source at build time.
+- Targets `netstandard2.0`, `net8.0` and `net10.0`.
+- Validated against a large Russian name-form corpus.
+
+Licensed under MIT.
