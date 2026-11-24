@@ -58,6 +58,7 @@ public sealed class RuName
         => GenderHint ?? GenderDetector.Detect(FirstName, LastName, MiddleName);
 
     /// <summary>Склоняет все заданные части, возвращает строку «Фамилия Имя Отчество» в целевом падеже.</summary>
+    /// <param name="case">Целевой падеж.</param>
     /// <param name="vocativeStyle">Стиль звательного падежа (учитывается только для имени).</param>
     public string Decline(Case @case, VocativeStyle vocativeStyle = VocativeStyle.Colloquial)
     {
