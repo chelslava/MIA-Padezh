@@ -28,7 +28,6 @@ public class NationalSurnamesTests
     [InlineData("Гогебашвили", Gender.Male, Case.Genitive, "Гогебашвили")]
     [InlineData("Гогебашвили", Gender.Male, Case.Instrumental, "Гогебашвили")]
     [InlineData("Шеварднадзе", Gender.Male, Case.Genitive, "Шеварднадзе")]
-    [InlineData("Гогебашвили", Gender.Male, Case.Genitive, "Гогебашвили")]
     public void GeorgianUnchangeable(string word, Gender gender, Case @case, string expected)
     {
         Assert.Equal(expected, Padezh.Decline(NamePart.LastName, word, @case, gender));
