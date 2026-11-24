@@ -17,34 +17,56 @@ internal static class DeclensionEngine
     /// <summary>Склоняет слово (или дефисное составное) в заданный падеж.</summary>
     public static string Inflect(string name, Case @case, NamePart part, Gender gender, VocativeStyle style = VocativeStyle.Colloquial)
     {
+        return Inflect(name, @case, part, gender, style, out _);
+    }
+
+    /// <summary>
+    /// Склоняет слово в падеж и сообщает, нашлось ли правило. <paramref name="matched"/> = false
+    /// означает, что правила для слова нет (возвращён вход без изменений) — сигнал
+    /// для нейро-fallback в MIA.Padezh.Neural.
+    /// </summary>
+    public static string Inflect(string name, Case @case, NamePart part, Gender gender, VocativeStyle style, out bool matched)
+    {
         if (@case == Case.Vocative)
-            return part == NamePart.FirstName ? Vocative(name, gender, style) : name;
+        {
+            matched = part == NamePart.FirstName;
+            return matched ? Vocative(name, gender, style) : name;
+        }
 
         if (@case == Case.Nominative || string.IsNullOrEmpty(name))
+        {
+            matched = true;
             return name;
+        }
 
         var chunks = name.Split('-');
         if (chunks.Length == 1)
-            return FindAndApply(chunks[0], @case, part, gender, firstWord: false);
+            return FindAndApply(chunks[0], @case, part, gender, firstWord: false, out matched);
 
         var result = new string[chunks.Length];
+        matched = true;
         for (int i = 0; i < chunks.Length; i++)
         {
             bool firstWord = i == 0;
-            result[i] = FindAndApply(chunks[i], @case, part, gender, firstWord);
+            result[i] = FindAndApply(chunks[i], @case, part, gender, firstWord, out var chunkMatched);
+            matched &= chunkMatched;
         }
 
         return string.Join("-", result);
     }
 
-    private static string FindAndApply(string chunk, Case @case, NamePart part, Gender gender, bool firstWord)
+    private static string FindAndApply(string chunk, Case @case, NamePart part, Gender gender, bool firstWord, out bool matched)
     {
         var rule = FindRule(chunk, RulesTable.Exceptions(part), gender, firstWord, wholeWord: true)
                 ?? FindRule(chunk, RulesTable.Suffixes(part), gender, firstWord, wholeWord: false);
 
         if (rule is null)
+        {
+            matched = false;
             return chunk;
+        }
 
+        matched = true;
         return Apply(chunk, rule.Value.Mods[CaseIndex(@case)]);
     }
 

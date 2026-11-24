@@ -36,7 +36,9 @@ jobs:
         run: dotnet test tests/MIA.Padezh.Tests -c Release --no-build
 
       - name: Pack
-        run: dotnet pack src/MIA.Padezh -c Release --no-build -o artifacts
+        run: |
+          dotnet pack src/MIA.Padezh -c Release --no-build -o artifacts
+          dotnet pack src/MIA.Padezh.Neural -c Release --no-build -o artifacts
 
       - name: NuGet login (OIDC → временный API-ключ)
         uses: NuGet/login@v1

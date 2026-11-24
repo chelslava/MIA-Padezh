@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>MIA.Padezh.Neural</RootNamespace>
+    <AssemblyName>MIA.Padezh.Neural</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>0.5.0</Version>
+    <PackageId>MIA.Padezh.Neural</PackageId>
+    <Authors>MIA</Authors>
+    <Product>MIA.Padezh.Neural</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Нейро-fallback для MIA.Padezh: склонение фамилий, не покрытых правилами (ONNX, char-level seq2seq, обучен на корпусе petrovich-eval). Правила остаются в приоритете; модель вызывается только там, где правило не нашлось.</Description>
+    <PackageTags>склонение;падеж;padezh;declension;russian;fio;onnx;neural;petrovich</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MIA.Padezh\MIA.Padezh.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Models\*.onnx;Models\vocab.txt" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

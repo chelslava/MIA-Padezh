@@ -19,6 +19,25 @@ public static class Padezh
         return DeclensionEngine.Inflect(value, @case, part, resolvedGender, vocativeStyle);
     }
 
+    /// <summary>
+    /// Пытается склонить часть ФИО по правилам. <paramref name="declined"/> получает
+    /// результат в любом случае (при отсутствии правила — вход без изменений),
+    /// а возвращаемое значение сообщает, нашлось ли правило. Точка расширения
+    /// для гибридных решений (см. MIA.Padezh.Neural).
+    /// </summary>
+    public static bool TryDecline(NamePart part, string value, Case @case, out string declined, Gender? gender = null)
+    {
+        if (@case == Case.Vocative || string.IsNullOrWhiteSpace(value))
+        {
+            declined = Decline(part, value, @case, gender);
+            return true;
+        }
+
+        var resolvedGender = gender ?? GenderDetector.DetectPart(part, value);
+        declined = DeclensionEngine.Inflect(value, @case, part, resolvedGender, VocativeStyle.Colloquial, out var matched);
+        return matched;
+    }
+
     /// <summary>Определяет род части ФИО по правилам.</summary>
     public static Gender DetectGender(NamePart part, string value)
         => GenderDetector.DetectPart(part, value);

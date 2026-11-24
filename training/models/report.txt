@@ -1,0 +1,5 @@
+train_pairs=97860
+holdout_pairs=3120
+holdout_accuracy=0.8987
+arch=char-level GRU seq2seq, emb=64 hidden=192, ~0.5M params
+note=правила покрывают 99.88% корпуса; модель вызывается только при отсутствии правила

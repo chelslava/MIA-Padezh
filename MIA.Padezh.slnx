@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/MIA.Padezh.Neural/MIA.Padezh.Neural.csproj" />
     <Project Path="src/MIA.Padezh/MIA.Padezh.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/MIA.Padezh.Neural.Tests/MIA.Padezh.Neural.Tests.csproj" />
     <Project Path="tests/MIA.Padezh.Tests/MIA.Padezh.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
