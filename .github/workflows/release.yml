@@ -1,0 +1,52 @@
+# Публикация на NuGet.org через trusted publishing (OIDC, без API-ключей).
+# https://learn.microsoft.com/ru-ru/nuget/nuget-org/trusted-publishing
+#
+# Политика на nuget.org (Trusted publishing) должна указывать:
+#   Владелец: chelslava | Репозиторий: MIA-Padezh | Файл рабочего процесса: release.yml
+#   Среда: (пусто — workflow среды не использует)
+name: Publish to NuGet.org
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # ручной запуск для публикации текущего main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # выдача OIDC-токена GitHub — обязательное разрешение
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/MIA.Padezh.Tests -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/MIA.Padezh -c Release --no-build -o artifacts
+
+      - name: NuGet login (OIDC → временный API-ключ)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: chelslava # имя профиля nuget.org (не email); рекомендуется вынести в секрет NUGET_USER
+
+      - name: NuGet push
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "${{ steps.login.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
